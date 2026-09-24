@@ -105,21 +105,18 @@ def limit_text(text, max_chars):
         + "\n\n[Input truncated because it exceeded the application limit.]"
     )
 
-
 def create_resume_agent(api_key):
-    """
-    Create the single CrewAI agent.
-    """
 
     llm = LLM(
-        model=MODEL_NAME,
+        model="groq/openai/gpt-oss-120b",
         api_key=api_key,
         temperature=0.1,
-        max_completion_tokens=4000,
+        max_tokens=4000,
     )
 
     agent = Agent(
         role="Resume and Job Description Analyst",
+
         goal=(
             "Compare a candidate's resume against a target job description "
             "using only information explicitly present in the resume. "
@@ -127,6 +124,7 @@ def create_resume_agent(api_key):
             "areas, and practical resume improvements without fabricating "
             "qualifications or experience."
         ),
+
         backstory=(
             "You are a careful professional resume analyst. "
             "You understand recruitment language, skills, qualifications, "
@@ -136,9 +134,13 @@ def create_resume_agent(api_key):
             "job experience, achievement, software, domain knowledge, or "
             "qualification unless it is explicitly supported by the resume."
         ),
+
         llm=llm,
         verbose=False,
         allow_delegation=False,
+
+        # Prevent unnecessary CrewAI caching behavior.
+        cache=False,
     )
 
     return agent
